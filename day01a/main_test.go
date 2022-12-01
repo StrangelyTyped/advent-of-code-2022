@@ -37,7 +37,11 @@ const testResultPart1 = 24000
 const testResultPart2 = 45000
 
 func TestParsing(t *testing.T) {
-	result := parseElves(utils.CleanInput(testInput))
+	ch := parseElves(strings.NewReader(utils.CleanInput(testInput)))
+	result := []int{}
+	for x := range ch {
+		result = append(result, x)
+	}
 	if !reflect.DeepEqual(result, testParseResult) {
 		t.Errorf("expected %v, got %v", testParseResult, result)
 	}

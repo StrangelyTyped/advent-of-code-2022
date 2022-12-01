@@ -1,4 +1,4 @@
-package day01
+package main
 
 import (
 	"io"
@@ -27,9 +27,9 @@ func parseElves(input string) []int {
 	return result
 }
 
-func Part1(input string) int {
+func Part1(input io.Reader) int {
 	maxElf := 0
-	for _, elf := range parseElves(input) {
+	for _, elf := range parseElves(utils.ReadInput(input)) {
 		if elf > maxElf {
 			maxElf = elf
 		}
@@ -37,14 +37,13 @@ func Part1(input string) int {
 	return maxElf
 }
 
-func Part2(input string) int {
-	elves := parseElves(input)
+func Part2(input io.Reader) int {
+	elves := parseElves(utils.ReadInput(input))
 	sort.Ints(elves)
 	count := len(elves)
 	return elves[count-1] + elves[count-2] + elves[count-3]
 }
 
-func Main(instream io.Reader) (int, int) {
-	input := utils.ReadInput(instream)
-	return Part1(input), Part2(input)
+func main() {
+	utils.Run("day01.txt", Part1, Part2)
 }
