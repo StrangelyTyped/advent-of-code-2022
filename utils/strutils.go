@@ -23,3 +23,11 @@ func ReadInput(reader io.Reader) string {
 func PrintOutput(result1, result2 int) {
 	fmt.Printf("Part 1: %d\nPart 2: %d\n\n", result1, result2)
 }
+
+func MapToInt(in []string) []int {
+	out := []int{}
+	for _, x := range in {
+		out = append(out, AtoiOrPanic(x))
+	}
+	return out
+}
