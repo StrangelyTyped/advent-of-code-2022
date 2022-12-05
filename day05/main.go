@@ -2,12 +2,19 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
+	"math"
 	"strings"
 
 	"github.com/strangelytyped/advent-of-code-2022/utils"
 )
+
+func Min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
 
 func addState(state *[][]string, line string) *[][]string {
 	for len(*state) < ((len(line) + 1) / 4) {
@@ -26,7 +33,7 @@ func addState(state *[][]string, line string) *[][]string {
 	return state
 }
 
-func Part1(input io.Reader) string {
+func solve(input io.Reader, maxStack int) string {
 	scanner := bufio.NewScanner(input)
 	stacks := [][]string{}
 	readingState := true
@@ -34,7 +41,6 @@ func Part1(input io.Reader) string {
 		line := scanner.Text()
 		if readingState {
 			if len(strings.TrimSpace(line)) == 0 {
-				fmt.Printf("%v\n", stacks)
 				readingState = false
 				continue
 			} else {
@@ -45,10 +51,11 @@ func Part1(input io.Reader) string {
 			count := utils.AtoiOrPanic(tokens[1])
 			source := utils.AtoiOrPanic(tokens[3]) - 1
 			dest := utils.AtoiOrPanic(tokens[5]) - 1
-			for i := 0; i < count; i++ {
-				token := stacks[source][0]
-				stacks[source] = stacks[source][1:]
-				stacks[dest] = append([]string{token}, stacks[dest]...)
+			for i := 0; i < count; i+= maxStack {
+				chunk := Min(maxStack, count)
+				move := stacks[source][0:chunk]
+				stacks[source] = stacks[source][chunk:]
+				stacks[dest] = append(append([]string{}, move...), stacks[dest]...)
 			}
 		}
 	}
@@ -59,37 +66,12 @@ func Part1(input io.Reader) string {
 	return str
 }
 
+func Part1(input io.Reader) string {
+	return solve(input, 1)
+}
+
 func Part2(input io.Reader) string {
-	scanner := bufio.NewScanner(input)
-	stacks := [][]string{}
-	readingState := true
-	for scanner.Scan() {
-		line := scanner.Text()
-		if readingState {
-			if len(strings.TrimSpace(line)) == 0 {
-				fmt.Printf("%v\n", stacks)
-				readingState = false
-				continue
-			} else {
-				stacks = *addState(&stacks, line)
-			}
-		} else {
-			tokens := strings.Split(line, " ")
-			count := utils.AtoiOrPanic(tokens[1])
-			source := utils.AtoiOrPanic(tokens[3]) - 1
-			dest := utils.AtoiOrPanic(tokens[5]) - 1
-
-			move := stacks[source][0:count]
-			stacks[source] = stacks[source][count:]
-			stacks[dest] = append(append([]string{}, move...), stacks[dest]...)
-
-		}
-	}
-	str := ""
-	for i := 0; i < len(stacks); i++ {
-		str = str + stacks[i][0]
-	}
-	return str
+	return solve(input, math.MaxInt32)
 }
 
 func main() {
