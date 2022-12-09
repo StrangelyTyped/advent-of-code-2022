@@ -17,3 +17,19 @@ func Atoi64OrPanic(input string) uint64 {
 	}
 	return entry
 }
+
+func Abs(in int) int {
+	if in < 0 {
+		return -in
+	}
+	return in
+}
+
+func Sign(in int) int {
+	if in < 0 {
+		return -1
+	} else if in > 0 {
+		return 1
+	}
+	return 0
+}

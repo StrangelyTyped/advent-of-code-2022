@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 
 	"github.com/strangelytyped/advent-of-code-2022/utils"
@@ -93,7 +92,6 @@ func Part2(input io.Reader) int {
 				
 			if score > maxScore {
 				maxScore = score
-				fmt.Printf("%d/%d\n", x, y)
 			}
 		}
 	}
