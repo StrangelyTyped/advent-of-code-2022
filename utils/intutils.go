@@ -18,6 +18,13 @@ func Atoi64OrPanic(input string) uint64 {
 	return entry
 }
 
+func Max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func Abs(in int) int {
 	if in < 0 {
 		return -in
