@@ -12,7 +12,9 @@ import (
 
 var parseRe = regexp.MustCompile(`Valve (.*) has flow rate=(\d+); tunnels? leads? to valves? (.*)`)
 
-func solve(valves map[int]ValveRoom, remainingTime int, currentRoom []int, visited uint64, memo map[Memo]int) int {
+const debug = false
+
+func solve(valves map[int]ValveRoom, remainingTime int, currentRoom []int, visited uint64, memo map[Memo]int, path [][]int) int {
 	if remainingTime <= 0 {
 		return 0
 	}
@@ -31,7 +33,7 @@ func solve(valves map[int]ValveRoom, remainingTime int, currentRoom []int, visit
 	for _, currentPersonRoom := range currentRoom {
 		valveDef := valves[currentPersonRoom]
 		tunnelOptions := valveDef.tunnels
-		if valveDef.flow > 0 && (visited & valveDef.bitFlag) == 0 {
+		if valveDef.flow > 0 && (visited&valveDef.bitFlag) == 0 {
 			tunnelOptions = append(tunnelOptions, currentPersonRoom)
 		}
 		newTunnels = append(newTunnels, tunnelOptions)
@@ -43,22 +45,27 @@ func solve(valves map[int]ValveRoom, remainingTime int, currentRoom []int, visit
 		flowHere := 0
 
 		for i := range currentRoom {
-			if currentRoom[i] == newRooms[i]{
+			if currentRoom[i] == newRooms[i] {
 				valveDef := valves[currentRoom[i]]
-				if valveDef.flow > 0 && remainingTime > 0 && (thisVisited & valveDef.bitFlag) == 0 {
+				if valveDef.flow > 0 && remainingTime > 0 && (thisVisited&valveDef.bitFlag) == 0 {
 					thisVisited |= valveDef.bitFlag
 					flowHere += valveDef.flow * (remainingTime - 1)
 				}
 			}
 		}
 
-		flowOption := solve(valves, remainingTime-1, newRooms, thisVisited, memo)
-		flowOut = utils.Max(flowOut, flowHere + flowOption)
+		newPath := path
+		if debug {
+			newPath = append(path, newRooms)
+		}
+
+		flowOption := solve(valves, remainingTime-1, newRooms, thisVisited, memo, newPath)
+		flowOut = utils.Max(flowOut, flowHere+flowOption)
 
 	}
 
 	memo[myMemo1] = flowOut
-	
+
 	return flowOut
 }
 
@@ -71,8 +78,8 @@ func combine(tunnelOptions [][]int) [][]int {
 		}
 	} else {
 		extant := map[uint64]bool{}
-		subCombinations := combine(tunnelOptions[1:])
-		for _, option := range tunnelOptions[0] {
+		subCombinations := combine(tunnelOptions[0 : len(tunnelOptions)-1])
+		for _, option := range tunnelOptions[len(tunnelOptions)-1] {
 			for _, subCombo := range subCombinations {
 				newCombo := append(subCombo, option)
 				posBitflag := roomListToPos(newCombo)
@@ -99,6 +106,7 @@ type ValveRoom struct {
 	tunnels []int
 	bitFlag uint64
 	index   int
+	name    string
 }
 
 type Memo struct {
@@ -110,11 +118,9 @@ type Memo struct {
 func Part1(input io.Reader) int {
 	valves, startIdx := readInput(input)
 	memo := map[Memo]int{}
-	result := solve(valves, 30, []int{startIdx}, uint64(0), memo)
+	result := solve(valves, 30, []int{startIdx}, uint64(0), memo, [][]int{})
 	return result
 }
-
-
 
 func readInput(input io.Reader) (map[int]ValveRoom, int) {
 	scanner := bufio.NewScanner(input)
@@ -152,7 +158,7 @@ func readInput(input io.Reader) (map[int]ValveRoom, int) {
 			tunnelIds = append(tunnelIds, getValveIdx(tunnel))
 		}
 
-		valves[valveIdx] = ValveRoom{flow, tunnelIds, uint64(1) << valveIdx, valveIdx}
+		valves[valveIdx] = ValveRoom{flow, tunnelIds, uint64(1) << valveIdx, valveIdx, valveId}
 	}
 	return valves, startIdx
 }
@@ -160,7 +166,7 @@ func readInput(input io.Reader) (map[int]ValveRoom, int) {
 func Part2(input io.Reader) int {
 	valves, startIdx := readInput(input)
 	memo := map[Memo]int{}
-	result := solve(valves, 26, []int{startIdx, startIdx}, uint64(0), memo)
+	result := solve(valves, 26, []int{startIdx, startIdx}, uint64(0), memo, [][]int{})
 	return result
 }
 

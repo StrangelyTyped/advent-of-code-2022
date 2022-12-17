@@ -79,7 +79,7 @@ func parseInput(input io.Reader) (map[Position]SensorResult, int, int) {
 	scanner := bufio.NewScanner(input)
 
 	sensors := map[Position]SensorResult{}
-	minX := math.MaxInt
+	minX := math.MaxInt32
 	maxX := 0
 	for scanner.Scan() {
 		line := scanner.Text()
